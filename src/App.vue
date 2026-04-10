@@ -1,31 +1,43 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import Navbar from './components/Navbar.vue';
 import ProductCard from './components/ProductCard.vue';
-import { ref } from 'vue';
+import { getProducts } from './services/productService';
 import type { Product } from './types/product';
 
-// Mock data for Day 2 to test the design
-const testProduct = ref<Product>({
-  id: 1,
-  title: "Test Product",
-  description: "This is a sample description to test the card layout.",
-  price: 99.99,
-  thumbnail: "https://via.placeholder.com/150",
-  category: "test",
-  brand: "test-brand",
-  images: [],
-  rating: 4.5,
-  stock: 10
+const products = ref<Product[]>([]);
+const isLoading = ref(true);
+
+onMounted(async () => {
+  try {
+    products.value = await getProducts();
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+  } finally {
+    isLoading.value = false;
+  }
 });
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50">
     <Navbar />
+    
     <main class="max-w-7xl mx-auto p-6">
-      <h2 class="text-2xl font-bold mb-6">Featured Products</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <ProductCard :product="testProduct" />
+      <h2 class="text-3xl font-bold text-slate-800 mb-8 text-center sm:text-left">
+        Trending Products
+      </h2>
+
+      <div v-if="isLoading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <ProductCard 
+          v-for="product in products" 
+          :key="product.id" 
+          :product="product" 
+        />
       </div>
     </main>
   </div>
