@@ -5,14 +5,13 @@ const { cart, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart(
 
 const emit = defineEmits(['close']);
 
-
 const handleCheckout = () => {
   if (cart.value.length === 0) return;
 
   const confirmPurchase = confirm(`Your total is $${totalPrice.value.toFixed(2)}. Confirm purchase?`);
   
   if (confirmPurchase) {
-    alert('🚀 Order Placed! Thank you for shopping with My Quick Buy.');
+    alert('Order Placed! Thank you for shopping with My Quick Buy.');
     clearCart();
     emit('close');
   }

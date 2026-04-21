@@ -1,12 +1,8 @@
 export interface Product {
   id: number;
   title: string;
-  description: string;
   price: number;
-  rating: number;
-  stock: number;
-  brand: string;
+  thumbnail: string; // Change 'image' to 'thumbnail'
   category: string;
-  thumbnail: string;
-  images: string[];
+  description: string;
 }
