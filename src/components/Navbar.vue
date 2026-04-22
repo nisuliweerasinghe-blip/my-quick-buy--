@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 
+// 1. ADDED: Define 'cartCount' as a prop so App.vue can send the real number
+defineProps<{
+  cartCount: number
+}>();
+
 // Define the events this component can send to App.vue
 const emit = defineEmits(['search', 'open-cart']);
 
@@ -41,8 +46,11 @@ watch(localSearchQuery, (newQuery) => {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           
-          <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-[#0F172A]">
-            2
+          <span 
+            v-if="cartCount > 0"
+            class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-[#0F172A]"
+          >
+            {{ cartCount }}
           </span>
         </button>
 

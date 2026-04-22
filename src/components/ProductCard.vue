@@ -9,11 +9,16 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Define the emit to tell App.vue to open the Detail Modal
-const emit = defineEmits(['view-detail']);
+// 1. ADDED: 'add-to-cart' to the emits list
+const emit = defineEmits(['view-detail', 'add-to-cart']);
 
 const handleCardClick = () => {
   emit('view-detail', props.product);
+};
+
+// 2. ADDED: Function to handle the button click specifically
+const handleAddToCart = () => {
+  emit('add-to-cart', props.product);
 };
 </script>
 
@@ -46,8 +51,8 @@ const handleCardClick = () => {
         </div>
         
         <button 
-          @click.stop 
-          class="bg-[#0F172A] hover:bg-blue-600 text-white p-2.5 rounded-xl transition-colors shadow-lg shadow-slate-200"
+          @click.stop="handleAddToCart" 
+          class="bg-[#0F172A] hover:bg-blue-600 text-white p-2.5 rounded-xl transition-colors shadow-lg shadow-slate-200 active:scale-95"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

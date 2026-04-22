@@ -1,11 +1,26 @@
 <script setup lang="ts">
 import type { Product } from '../types/product';
+// 1. Import the shared cart logic
+import { useCart } from '../composables/useCart';
 
-defineProps<{
+const props = defineProps<{
   product: Product | null;
 }>();
 
-defineEmits(['close']);
+// 2. Define emits for both closing and adding to cart
+const emit = defineEmits(['close', 'add-to-cart']);
+
+// 3. Initialize the cart composable
+const { addToCart } = useCart();
+
+const handleAddToCart = () => {
+  if (props.product) {
+    // Call the shared composable function
+    addToCart(props.product);
+    // Tell the parent (App.vue) an item was added (useful for closing the modal or showing a toast)
+    emit('add-to-cart', props.product);
+  }
+};
 </script>
 
 <template>
@@ -35,8 +50,12 @@ defineEmits(['close']);
           </p>
           
           <div class="mt-10 flex items-center justify-between">
-            <span class="text-4xl font-black text-slate-900">${{ product.price }}</span>
-            <button class="bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200">
+            <span class="text-4xl font-black text-slate-900">${{ product.price.toFixed(2) }}</span>
+            
+            <button 
+              @click="handleAddToCart"
+              class="bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200"
+            >
               Add to Cart
             </button>
           </div>
@@ -45,3 +64,21 @@ defineEmits(['close']);
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Added these as a fallback in case your tailwind-animate plugin isn't installed */
+.animate-in {
+  animation: modalEnter 0.3s ease-out;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+</style>

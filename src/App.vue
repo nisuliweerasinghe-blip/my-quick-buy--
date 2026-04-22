@@ -8,7 +8,10 @@ import ProductDetailModal from './components/ProductDetailModal.vue';
 import { getProducts, getCategories } from './services/productService';
 import type { Product } from './types/product';
 
-// --- 1. State Management ---
+// 1. COMPOSABLE (The single source of truth for your cart)
+import { useCart } from './composables/useCart';
+
+// --- State Management ---
 const products = ref<Product[]>([]);
 const categories = ref<string[]>([]);
 const searchQuery = ref('');
@@ -20,7 +23,10 @@ const isCartOpen = ref(false);
 const isDetailOpen = ref(false);
 const selectedProduct = ref<Product | null>(null);
 
-// --- 2. Data Fetching (Requirement 5) ---
+// 2. EXTRACT CART LOGIC (No local 'cart' ref needed here)
+const { cart, addToCart } = useCart();
+
+// --- 3. Data Fetching ---
 onMounted(async () => {
   try {
     const [prodData, catData] = await Promise.all([getProducts(), getCategories()]);
@@ -33,7 +39,7 @@ onMounted(async () => {
   }
 });
 
-// --- 3. Search & Filter Logic (Requirement 5) ---
+// --- 4. Search & Filter Logic ---
 const filteredProducts = computed(() => {
   return products.value.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.value.toLowerCase());
@@ -42,10 +48,16 @@ const filteredProducts = computed(() => {
   });
 });
 
-// --- 4. Event Handlers ---
+// --- 5. Event Handlers ---
 const openProductDetail = (product: Product) => {
   selectedProduct.value = product;
   isDetailOpen.value = true;
+};
+
+// This function now uses the shared composable function
+const handleAddToCart = (product: Product) => {
+  addToCart(product);
+  console.log("Item added! New total items:", cart.value.length);
 };
 
 const clearFilters = () => {
@@ -57,19 +69,24 @@ const clearFilters = () => {
 <template>
   <div class="min-h-screen bg-slate-50 font-sans antialiased">
     <Navbar 
+      :cartCount="cart.length"
       @search="(q) => searchQuery = q" 
       @open-cart="isCartOpen = true" 
     />
 
     <Transition name="fade">
-      <CartModal v-if="isCartOpen" @close="isCartOpen = false" />
+      <CartModal 
+        v-if="isCartOpen" 
+        @close="isCartOpen = false" 
+      />
     </Transition>
 
     <Transition name="fade">
       <ProductDetailModal 
         v-if="isDetailOpen" 
         :product="selectedProduct" 
-        @close="isDetailOpen = false" 
+        @close="isDetailOpen = false"
+        @add-to-cart="handleAddToCart"
       />
     </Transition>
 
@@ -96,6 +113,7 @@ const clearFilters = () => {
             :key="p.id" 
             :product="p" 
             @view-detail="openProductDetail"
+            @add-to-cart="handleAddToCart"
           />
         </div>
 
@@ -117,7 +135,6 @@ const clearFilters = () => {
 </template>
 
 <style>
-/* Global Transitions for Modals */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -128,7 +145,6 @@ const clearFilters = () => {
   opacity: 0;
 }
 
-/* Smooth background color transitions */
 html {
   scroll-behavior: smooth;
 }
