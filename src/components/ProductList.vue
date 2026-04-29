@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// Requirement 2: No "Any" - Using strict TypeScript
+
 import ProductCard from './ProductCard.vue';
 import type { Product } from '../types/product';
 
-// Requirement: Define props strictly
+
 interface Props {
   products: Product[];
 }
@@ -22,7 +22,7 @@ defineProps<Props>();
 </template>
 
 <style scoped>
-/* Optional: Adds a smooth fade-in effect when items are filtered */
+
 .grid {
   animation: fadeIn 0.4s ease-in-out;
 }
